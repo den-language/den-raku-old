@@ -1,0 +1,4 @@
+(executable
+  (name Den)
+  (public_name Den)
+  (libraries console.lib lib))
