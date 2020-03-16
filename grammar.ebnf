@@ -1,0 +1,38 @@
+
+master = { statement };
+statement = function_definition;
+function definition = [ pub | pri ], [ type_id ], name_id, [ arguments ], arrow, "{" { statement } "}"] | expression ";";
+
+arguments = "(", [ positional_args, [ "," ] ], [optional_args, [ "," ] ], [ keyword_args, [ "," ] ], ")";
+
+positional_args = 
+    ( 
+        { type_id, ":", name_id, "," }, type_id, ":", name_id 
+    ) | 
+    ( type_id, ":", name_id );
+
+optional_args = 
+    ( 
+        { type_id, ":", name_id, "?", "," }, type_id, ":", name_id, "?" 
+    ) | 
+    ( type_id, ":", name_id, "?" );
+
+keyword_args = 
+    ( 
+        { type_id, ":", name_id, "=", expression, "," }, type_id, ":", name_id, "=", expression 
+    ) | 
+    ( type_id, ":", name_id, "=", expression );
+
+epxression = int;
+int = { digit };
+
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+type_id = ID;
+name_id = ID;
+ref_id = ID;
+
+pub = "pub";
+pri = "pri";
+arrow = "=>";
+

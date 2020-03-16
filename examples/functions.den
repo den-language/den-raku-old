@@ -1,1 +1,8 @@
-pub int entry => { }
+pri int add(int: x, int: y) => x+y;
+
+pub int entry => {
+    int: x, y;
+    x = 10;
+    y = &x+10;
+    
+}

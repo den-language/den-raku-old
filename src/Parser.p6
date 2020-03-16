@@ -25,7 +25,7 @@ grammar Den does Grammar::PrettyErrors {
     rule statement { <function-definition> }
 
     rule function-definition {
-        <pub>?
+        [ <pub> | <pri>]?
         <type>?
         <name-id>
         <arguments>?
@@ -42,18 +42,15 @@ grammar Den does Grammar::PrettyErrors {
     }
 
     rule positional-args {
-        [<type-id> ':' <name-id> ',']+
-        [<type-id> ':' <name-id>] | [<type-id> ':' <name-id>]
+        [[<type-id> ':' <name-id> ',']+ [<type-id> ':' <name-id>]] | [<type-id> ':' <name-id>]
     }
 
     rule optional-args {
-        [<type-id> ':' <name-id> '?' ',']+
-        [<type-id> ':' <name-id> '?'] | [<type-id> ':' <name-id> '?']
+        [[<type-id> ':' <name-id> '?' ',']+ [<type-id> ':' <name-id> '?']] | [<type-id> ':' <name-id> '?']
     }
 
     rule keyword-args {
-        [<type-id> ':' <name-id> '=' <expression> ',']+
-        [<type-id> ':' <name-id> '=' <expression>] | [<type-id> ':' <name-id> '=' <expression>]
+        [[<type-id> ':' <name-id> '=' <expression> ',']+ [<type-id> ':' <name-id> '=' <expression>]] | [<type-id> ':' <name-id> '=' <expression>]
     }
 
     token expression { <int> }
@@ -65,6 +62,7 @@ grammar Den does Grammar::PrettyErrors {
 
     token arrow { '=>' }
     token pub   { 'pub' }
+    token pri   { 'pri' }
 }
 
 my $test = slurp 'examples/functions.den';
