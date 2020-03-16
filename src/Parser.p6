@@ -53,8 +53,11 @@ grammar Den does Grammar::PrettyErrors {
         [[<type-id> ':' <name-id> '=' <expression> ',']+ [<type-id> ':' <name-id> '=' <expression>]] | [<type-id> ':' <name-id> '=' <expression>]
     }
 
-    token expression { <int> }
+    token expression { <int> | <reference> | <ref-id>}
+    rule add {}
+
     token int        { \d+ }
+    rule reference  { "&" <ref-id> }
 
     token name-id { <.alpha> \w* }
     token ref-id  { <.alpha> \w* }

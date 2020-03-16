@@ -1,8 +1,15 @@
 pri int add(int: x, int: y) => x+y;
 
 pub int entry => {
-    int: x, y;
+    int: x, y, z;
     x = 10;
-    y = &x+10;
-    
+    y = 10;
+    z = &x + &y + 1000;
+    // z is 1020
+
+    solve x => { z = 10, y = y };  // solve and assign x given z = 10 and y is the same (10)
+    // z=10 = x + y=y + 1000
+    // 10 = x + 10 + 1000
+    // x = 0
+    // x is now 0
 }
