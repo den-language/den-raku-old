@@ -1,25 +1,72 @@
 
+=begin comment
 grammar Tokens {
-    token arrow { "=>" }
-    token pub { "pub" }
+
 }
 
 grammar Identifier {
-    token name-id { <[A-Za-z_]> <[A-Za-z_0-9]>* }
-    token ref-id { <[A-Za-z_]> <[A-Za-z_0-9]>* }
-    token type { <[A-Za-z_]> <[A-Za-z_0-9]>* }
+
 }
 
 grammar Function is Identifier is Token {
-    token function-definition { <pub>? <type>? <name-id> <arguments>? <arrow> "\{" "\}" }
-    token arguments { "(" ")" }
+
 }
 
 grammar Statement is Function {
-    token statement { <function-definition> }
+
+}
+=end comment
+
+use Grammar::PrettyErrors;
+
+grammar Den does Grammar::PrettyErrors {
+    rule TOP { <statement>* }
+
+    rule statement { <function-definition> }
+
+    rule function-definition {
+        <pub>?
+        <type>?
+        <name-id>
+        <arguments>?
+        <arrow>
+        ['{' <statement>* '}'] | [<expression> ';']
+    }
+
+    rule arguments {
+        '('
+        [<positional-args> ','?]?
+        [<optional-args> ','?]?
+        [<keyword-args> ','?]?
+        ')'
+    }
+
+    rule positional-args {
+        [<type-id> ':' <name-id> ',']+
+        [<type-id> ':' <name-id>] | [<type-id> ':' <name-id>]
+    }
+
+    rule optional-args {
+        [<type-id> ':' <name-id> '?' ',']+
+        [<type-id> ':' <name-id> '?'] | [<type-id> ':' <name-id> '?']
+    }
+
+    rule keyword-args {
+        [<type-id> ':' <name-id> '=' <expression> ',']+
+        [<type-id> ':' <name-id> '=' <expression>] | [<type-id> ':' <name-id> '=' <expression>]
+    }
+
+    token expression { <int> }
+    token int        { \d+ }
+
+    token name-id { <.alpha> \w* }
+    token ref-id  { <.alpha> \w* }
+    token type    { <.alpha> \w* }
+
+    token arrow { '=>' }
+    token pub   { 'pub' }
 }
 
-grammar Den is Statement {
-    token TOP { <statement>* }
-}
+my $test = slurp 'examples/functions.den';
+say Den.parse($test);
 

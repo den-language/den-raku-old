@@ -1,5 +1,1 @@
-pub int entry => {
-     int: x;
-     x = 10;
-     x = 1203;
- }
+pub int entry => { }
