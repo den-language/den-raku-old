@@ -7,7 +7,8 @@ grammar Den {
     token statement { 
         <.s> 
         [ 
-            <function-definition> 
+            || <function-definition>
+            || <variable-dec>
         ]
         <.s> 
     }
@@ -42,15 +43,22 @@ grammar Den {
         ]+
     }
 
+    token variable-dec {
+        <type-id> <.s> ':' <.s> <name-id>+ %% [<.s> ',' <.s>] ';'
+    }
+
     token function-definition {
         [ $<visibility>=[ <.pub> | <.pri> ] <.r> ]?
         [ <type-id> <.r>]?
         <name-id> <.s>
         [<arguments> <.s>]?
         <.arrow> <.s>
-        [
-            | ['{' $<block>=[ <statement>* | <.s> ] '}' ] 
-            | [ <expression> ';' ]
+        [   
+            || [ <expression> ';' ]
+            || ['{' $<block>=[ 
+                    || <.s> <?before '}'>
+                    || <statement>* 
+                ] '}' ] 
         ] 
     }
 

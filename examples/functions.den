@@ -1,6 +1,6 @@
 pri int add(int: x, int: y, int: z?, int: hi = 10) => x+y%10**100;
 
-pub int entry => { }
+pub int entry => {  }
 
 /*
 /* */
