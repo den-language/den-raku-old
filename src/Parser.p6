@@ -1,67 +1,133 @@
-
-=begin comment
-grammar Tokens {
-
-}
-
-grammar Identifier {
-
-}
-
-grammar Function is Identifier is Token {
-
-}
-
-grammar Statement is Function {
-
-}
-=end comment
-
 use Grammar::PrettyErrors;
+use Grammar::Tracer;
 
-grammar Den does Grammar::PrettyErrors {
-    rule TOP { <statement>* }
+grammar Den {
+    token TOP { <statement>* }
 
-    rule statement { <function-definition> }
-
-    rule function-definition {
-        [ <pub> | <pri>]?
-        <type>?
-        <name-id>
-        <arguments>?
-        <arrow>
-        ['{' <statement>* '}'] | [<expression> ';']
+    token statement { 
+        <.s> 
+        [ 
+            <function-definition> 
+        ]
+        <.s> 
+    }
+    
+    token comment { 
+        '//' \N*
     }
 
-    rule arguments {
+	token multiline-comment {
+        '/*'
+        [
+            || <?{'/*'}> <.multiline-comment>
+            || '*' <!before '/'>
+            || .
+        ]*?
+        '*/'
+    }
+
+    token s {
+        [
+            | <.comment>
+            | <.multiline-comment>
+            | \s
+        ]*
+    }
+
+    token r {
+        [
+            | <.comment>
+            | <.multiline-comment>
+            | \s
+        ]+
+    }
+
+    token function-definition {
+        [ $<visibility>=[ <.pub> | <.pri> ] <.r> ]?
+        [ <type-id> <.r>]?
+        <name-id> <.s>
+        [<arguments> <.s>]?
+        <.arrow> <.s>
+        [
+            | ['{' $<block>=[ <statement>* | <.s> ] '}' ] 
+            | [ <expression> ';' ]
+        ] 
+    }
+
+    token arguments {
         '('
-        [<positional-args> ','?]?
-        [<optional-args> ','?]?
-        [<keyword-args> ','?]?
+        [ 
+            | <positional-args> 
+            | <optional-args> 
+            | <keyword-args> 
+        ] * %% [ ',' ]
         ')'
     }
 
-    rule positional-args {
-        [[<type-id> ':' <name-id> ',']+ [<type-id> ':' <name-id>]] | [<type-id> ':' <name-id>]
+    token positional-args {
+        | [ [ <.s> <type-id> <.s> ':' <.s> <name-id> <.s> ',' <.s> ]+? [ <type-id> <.s> ':' <.s> <name-id> <.s> ] ] 
+        | [ <.s> <type-id> <.s> ':' <.s> <name-id> <.s> ]
     }
 
-    rule optional-args {
-        [[<type-id> ':' <name-id> '?' ',']+ [<type-id> ':' <name-id> '?']] | [<type-id> ':' <name-id> '?']
+    token optional-args {
+        | [ [ <.s> <type-id> <.s> ':' <.s> <name-id> <.s> '?' <.s> ','<.s> ]+? [ <type-id> <.s> ':' <.s> <name-id> <.s> '?' <.s>] ] 
+        | [ <.s> <type-id> <.s> ':' <.s> <name-id> <.s> '?' <.s> ]
     }
 
-    rule keyword-args {
-        [[<type-id> ':' <name-id> '=' <expression> ',']+ [<type-id> ':' <name-id> '=' <expression>]] | [<type-id> ':' <name-id> '=' <expression>]
+    token keyword-args {
+        | [ [ <.s> <type-id> <.s> ':' <.s> <name-id> <.s> '=' <expression> ',' <.s> ]+? [ <type-id> <.s> ':' <.s> <name-id> <.s> '=' <expression> ] ] 
+        | [ <.s> <type-id> <.s> ':' <.s> <name-id> <.s> '=' <expression> ]
     }
 
-    token expression { <int> | <reference> | <ref-id>}
-    rule add {}
+    token expression { 
+        <.s> <expr3> <.s>
+    }
 
-    token int        { \d+ }
-    rule reference  { "&" <ref-id> }
+    token expression-item {
+        | <literal>
+        | <reference>
+        | <ref-id> 
+        | '(' <expression> ')'
+    }
+
+    token expr1 {
+        $<left>=<expression-item>
+        [   
+            <.s>
+            $<op> = '**'
+            <.s>
+            $<right>=<expression-item>
+        ]?
+    }
+
+    token expr2 {
+        $<left>=<.expr1>
+        [   
+            <.s>
+            $<op> = ( '*' | '/' | '%' )
+            <.s>
+            $<right>=<.expr1>
+        ]?
+    }
+
+    token expr3 {
+        $<left>=<.expr2>
+        [
+            <.s>
+            $<op> = ( '+' | '-' )
+            <.s>
+            $<right>=<.expr2>
+        ]?
+    }
+
+    proto token literal {*}
+    token literal:sym<int> { \d+ }
+
+    token reference  { "&" <ref-id> }
 
     token name-id { <.alpha> \w* }
     token ref-id  { <.alpha> \w* }
-    token type    { <.alpha> \w* }
+    token type-id    { <.alpha> \w* }
 
     token arrow { '=>' }
     token pub   { 'pub' }
@@ -70,4 +136,3 @@ grammar Den does Grammar::PrettyErrors {
 
 my $test = slurp 'examples/functions.den';
 say Den.parse($test);
-
