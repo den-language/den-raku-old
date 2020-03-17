@@ -80,23 +80,23 @@ grammar Den {
     }
 
     token expression { 
-        <.s> <expr3> <.s>
+        <.s> <expression=.expr3> <.s>
     }
 
     token expression-item {
-        | <literal>
+        | <int>
         | <reference>
         | <ref-id> 
         | '(' <expression> ')'
     }
 
     token expr1 {
-        $<left>=<expression-item>
+        $<left>=<.expression-item>
         [   
             <.s>
             $<op> = '**'
             <.s>
-            $<right>=<expression-item>
+            $<right>=<.expression-item>
         ]?
     }
 
@@ -120,8 +120,7 @@ grammar Den {
         ]?
     }
 
-    proto token literal {*}
-    token literal:sym<int> { \d+ }
+    token int { \d+ }
 
     token reference  { "&" <ref-id> }
 
