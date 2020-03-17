@@ -1,11 +1,8 @@
-module Helpers is export {
-    class File {
-        has $.contents;
-        has $.filename;
-    }
+use Module;
 
+module Helpers is export {
     our sub read-file($filename) {
-        File.new(
+        Module::File.new(
             contents => (slurp $filename),
             :$filename
         );
