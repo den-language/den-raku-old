@@ -1,9 +1,10 @@
 pri int add(int: x, int: y, int: z?, int: hi = 10) => &x+y%10**100;
 
 pub int entry => { 
-    int: x, y, z; 
+    int: x, y; 
     x = 10;
-    z = 10+10+10;
+    int: z = 10+10+10;
+    y = 10;
 }
 
 /*

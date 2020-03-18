@@ -1,7 +1,7 @@
 #use Grammar::PrettyErrors;
 #use Grammar::Tracer;
 
-module Parser is export {
+module Parsing::Parser is export {
     grammar Den {
         token TOP { <statement>* }
 
@@ -9,6 +9,7 @@ module Parser is export {
             <.s> 
             [ 
                 || <function-definition>
+                || <variable-assign-full>
                 || <variable-dec>
                 || <variable-assign>
             ]
@@ -51,6 +52,10 @@ module Parser is export {
 
         token variable-assign {
             <name-id> <.s> '=' <.s> <expression> ';'
+        }
+        
+        token variable-assign-full {
+            <type-id> <.s> ':' <.s> <name-id> <.s> '=' <.s> <expression> ';'
         }
 
         token function-definition {
@@ -98,7 +103,7 @@ module Parser is export {
         }
 
         token expression-item {
-            | <int>
+            | <literal>
             | <reference>
             | <ref-id> 
             | '(' <expression> ')'
@@ -134,7 +139,8 @@ module Parser is export {
             ]?
         }
 
-        token int { \d+ }
+        proto token literal {*}
+        token literal:sym<int>   { \d+ }
 
         token reference  { "&" <ref-id> }
 
